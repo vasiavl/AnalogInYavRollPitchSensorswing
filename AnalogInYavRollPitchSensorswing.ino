@@ -16,8 +16,8 @@ const int sensorSwingPin = A5; // датчик положения рулевых
 int sensorSwing = 0;//значения датчика положение рулевых колес
 int tvist=0;// ШИМ рулевого двигателя
 int tvistFlag;//значение реверса рулевого мотора
-int  Roll,outputRoll,outputRollR = 0;//преобразуем значения (приечем обрезанные 823-300) Roll в OutputRoll 1-1023
-      
+int  Roll,tvistTrans, tvistRoll = 0; //преобразуем значения (приечем обрезанные 823-300) Roll в tvistRoll 1-1023
+int  outputRoll,outputRollR = 0; // положение Roll через map в 0-255  для корректировки скорости бортовых двигателей  
 int Yaw,outputYawL,outputYawR, flagY,flagYF = 0;
 
 int Pitch = 0;        
@@ -29,8 +29,8 @@ int R,Rdriv = 0;// шим правого двигателя
 int But1=0;
 int But2=0;   //20
 int But3=0;
-int forwardR,forwardL,flag,flagP =0;//состояние реверса двигателей и флаги переключения состояний
-
+int forwardR,forwardL =0;//состояние реверса бортовых двигателей 
+int flag,flagP; //flag "вперед-назад"  flagP-предыдущее состояние флага
 void setup() {
     pinMode(Button_1, INPUT_PULLUP);
     pinMode(Button_2, INPUT_PULLUP);
@@ -47,46 +47,41 @@ void loop() {
   Pitch = analogRead(analogInPitchPin);
   forwardR=  digitalRead(forward_agoPinR);
   forwardL=  digitalRead(forward_agoPinL);
-  
-  outputRollR =  map(Roll, 823, 300, 1023, 0);
-  outputRoll = constrain(outputRollR, 0, 1023);
+  outputRoll =  map(Roll, 480, 0, 0, 100);//отклонение джоя в процентах
+  outputRollR =  map(Roll, 540, 1023, 0, 100);
+  tvistTrans =  map(Roll, 823, 300, 1023, 0);
+  tvistRoll = constrain(tvistTrans, 0, 1023);
   outputPitch = map(Pitch, 540, 1023, 0, 255); 
   outputPitchD = map(Pitch, 480, 0, 0, 255); 
   outputYawL = map(Yaw, 540, 1023, 0, 255); 
   outputYawR = map(Yaw, 480, 0, 0, 255);
-  
-               
-                                                                                                                                         
-   if (460>Pitch)
-   {       outputPitch= 0;
-           if (HIGH==forwardR|| HIGH==forwardL)
-              { forwardR =forwardL=flag= LOW;}
-           if (480>Roll){ R= outputPitchD;  outputRollR= 0;//left
-             if (Pitch>outputRoll)   L= (outputPitchD-outputRoll/1.5);
-             if (outputPitchD<outputRoll)   L= 0; }
-           if ((540>Roll)&& (Roll>480))  {  R=L=outputPitchD;     }                                                  
-           if  (Roll>540)   { L= outputPitchD;  outputRoll= 0;
-              if (outputPitchD>outputRollR)   R= (outputPitchD-outputRollR/1.5);
-              if (outputPitchD<outputRollR)   R= 0;}
+                                                                                                                                                                                         
+   if (460>Pitch) // вперед-outputPitchD
+   {     forwardR =forwardL=flag= LOW;
+       if (480>Roll)    {            R= outputPitchD;  //left
+                                     L= (outputPitchD-(outputPitchD/100*outputRoll)/1.5);
+                        }
+       if ((540>Roll)&& (Roll>480))  R=L=outputPitchD;                                                     
+       if  (Roll>540)   {            L= outputPitchD;  
+                                     R= (outputPitchD-(outputPitchD/100*outputRollR)/1.5);
+                        }
    }  
- if (Pitch > 560)
-  {             outputPitchD= 0;
-          if (LOW==forwardR|| LOW==forwardL)
-          { forwardR =forwardL=flag= HIGH ; }
-                                     
-          if  (480>Roll) { R= outputPitch;  outputRollR= 0;
-             if (outputPitch>outputRoll)   L= (outputPitch-outputRoll/1.5);
-             if (outputPitch<outputRoll)   L= 0; }          
-           if  ((540>Roll)&& (Roll>480)) {outputRoll= outputRollR =0; R=L= outputPitch;  } 
-          if  (Roll>540) {     L= outputPitch;   outputRoll= 0;
-             if (outputPitch>outputRollR)   R= (outputPitch-outputRollR/1.5);
-             if (outputPitch<outputRollR)   R= 0; }
-    }    
+ if (Pitch > 560) //назад-outputPitch
+  {   forwardR =forwardL=flag= HIGH ;         
+                                                                                
+     if  (480>Roll)     {             R= outputPitch;  
+                                      L= (outputPitch-(outputPitch/100*outputRoll)/1.5);
+                        }          
+     if  ((540>Roll)&& (Roll>480))    R=L= outputPitch;   
+     if  (Roll>540)     {             L= outputPitch;   
+                                      R= (outputPitch-(outputPitch/100*outputRollR)/1.5);
+                        }
+    }  
+  //================танковый разворот================================================  
     if ((560>Pitch)&& (Pitch >460))
     {  
-//================танковый разворот================================================      
-            outputRoll =outputRollR =  0;  // outputPitch =
-         if (   Yaw>540)//left
+       outputRoll =outputRollR =  0;  // outputPitch =
+         if (   Yaw>580)//left
          { 
               if (HIGH==forwardL|| LOW==forwardR)
               { forwardL= LOW; forwardR= HIGH; flagY= LOW; }  
@@ -100,26 +95,26 @@ void loop() {
                    R= 0;   L= outputYawR;
               if  (200>Yaw){  R=L= outputYawR; }  
           }                                                      
-         if ((540>Yaw)&& (Yaw >480)) {  R=L =0;}
+         if ((580>Yaw)&& (Yaw >480)) {  R=L =0;}
     }  
   
 //=============================Swing===============================================
 if  (Roll>580)// left  Ydiff
   { tvistFlag= LOW;   tvist=240 ;
-    if ( outputRoll- sensorSwing <=60)tvist=0 ;
+    if ( tvistRoll- sensorSwing <=60)tvist=0 ;
    }      
   if  (580>Roll&& Roll>440)//timeY=0 ;
-   { if  ( 560 > sensorSwing && sensorSwing >460) tvist=0 ; 
-     if  ( 560 < sensorSwing){tvistFlag= HIGH; tvist= map(sensorSwing ,560,1023,100,200) ; }
-     if  ( 460 >sensorSwing){tvistFlag= LOW; tvist= map(sensorSwing ,460,0,100,200); }
+   { if  ( 580 > sensorSwing && sensorSwing >440) tvist=0 ; 
+     if  ( 580 < sensorSwing){tvistFlag= HIGH; tvist= map(sensorSwing ,560,1023,100,200) ; }
+     if  ( 440 >sensorSwing){tvistFlag= LOW; tvist= map(sensorSwing ,460,0,100,200); }
    }  
   
   if  (440>Roll)//right
    {   tvistFlag= HIGH;  tvist=240 ;
-   if (sensorSwing-outputRoll<=20 )tvist=0 ;   
+   if (sensorSwing-tvistRoll<=20 )tvist=0 ;   
    }
    
-if (flag !=flagP){Rdriv=Ldriv=R=L=0; flagP=flag; }
+if (flag !=flagP){Rdriv=Ldriv=R=L=0; flagP=flag; }// если предыдущее состояние флага было иное бортовые двиг. стоп.
 if (flagY !=flagYF){Rdriv=Ldriv=0; flagYF=flagY; }
    if  (Rdriv-R >20)  { Rdriv=Rdriv-25;} 
    else {if (R-Rdriv>20)Rdriv=Rdriv+25;
