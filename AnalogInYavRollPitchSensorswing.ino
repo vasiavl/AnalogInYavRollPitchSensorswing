@@ -121,7 +121,7 @@ if (flagY !=flagYF){Rdriv=Ldriv=0; flagYF=flagY; }
       if (Ldriv-L >20) Ldriv=Ldriv-25;
           else Ldriv=L; }
           
-     analogWrite(analogWriteRPin, tvist);
+    // analogWrite(analogWriteRPin, tvist);
      digitalWrite( LRPin, tvistFlag);
      digitalWrite(forward_agoPinL , forwardL );
      digitalWrite(forward_agoPinR ,  forwardR );
