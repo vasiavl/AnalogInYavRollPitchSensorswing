@@ -47,15 +47,15 @@ void loop() {
   Pitch = analogRead(analogInPitchPin);
   forwardR=  digitalRead(forward_agoPinR);
   forwardL=  digitalRead(forward_agoPinL);
-  outputRoll =  map(Roll, 480, 0, 0, 100);//отклонение джоя в процентах
-  outputRollR =  map(Roll, 540, 1023, 0, 100);
-  tvistTrans =  map(Roll, 823, 300, 1023, 0);
-  tvistRoll = constrain(tvistTrans, 0, 1023);
+  outputRoll = constrain( map(Roll, 440, 0, 0, 100),0,100);//отклонение джоя в проценты
+  outputRollR = constrain( map(Roll, 540, 1023, 0, 100)0,100);//отклонение джоя в проценты
+  tvistTrans =  map(Roll, 823, 300, 1023, 0);// зажимаем джой чтобы для поворота не надо было его отклонять на 100%
+  tvistRoll = constrain(tvistTrans, 0, 1023);// фактически значение на которое колеса должны повернуть
   outputPitch = map(Pitch, 540, 1023, 0, 255); 
   outputPitchD = map(Pitch, 480, 0, 0, 255); 
-  outputYawL = map(Yaw, 540, 1023, 0, 255); 
-  outputYawR = map(Yaw, 480, 0, 0, 255);
-                                                                                                                                                                                         
+  outputYawL = map(Yaw, 580, 1023, 0, 255); 
+  outputYawR = map(Yaw, 440, 0, 0, 255);
+ //=============== работа дифференциала при поворотах и движение впередх-назад ========================                                                                                                                                                                                       
    if (460>Pitch) // вперед-outputPitchD
    {     forwardR =forwardL=flag= LOW;
        if (480>Roll)    {            R= outputPitchD;  //left
@@ -69,33 +69,30 @@ void loop() {
  if (Pitch > 560) //назад-outputPitch
   {   forwardR =forwardL=flag= HIGH ;         
                                                                                 
-     if  (480>Roll)     {             R= outputPitch;  
+     if  (440>Roll)     {             R= outputPitch;  
                                       L= (outputPitch-(outputPitch/100*outputRoll)/1.5);
                         }          
-     if  ((540>Roll)&& (Roll>480))    R=L= outputPitch;   
-     if  (Roll>540)     {             L= outputPitch;   
+     if  ((580>Roll)&& (Roll>440))    R=L= outputPitch;   
+     if  (Roll>580)     {             L= outputPitch;   
                                       R= (outputPitch-(outputPitch/100*outputRollR)/1.5);
                         }
     }  
   //================танковый разворот================================================  
     if ((560>Pitch)&& (Pitch >460))
     {  
-       outputRoll =outputRollR =  0;  // outputPitch =
-         if (   Yaw>580)//left
-         { 
-              if (HIGH==forwardL|| LOW==forwardR)
-              { forwardL= LOW; forwardR= HIGH; flagY= LOW; }  
-                  L = 0;  R= outputYawL;
-               if (Yaw>820) {  R= L= outputYawL; }                                        
-         }           
-         if (480>Yaw)//rait
-          { 
-              if (LOW==forwardL|| HIGH==forwardR)
-               {  forwardL= HIGH ; forwardR= LOW; flagY= HIGH;}
-                   R= 0;   L= outputYawR;
-              if  (200>Yaw){  R=L= outputYawR; }  
-          }                                                      
-         if ((580>Yaw)&& (Yaw >480)) {  R=L =0;}
+        if (   Yaw>580)//left
+              {   forwardL= LOW; forwardR= HIGH; flagY= LOW; 
+                                                       L = 0;
+                                                       R= outputYawL;
+                               if (Yaw>820)            R= L= outputYawL;                                        
+              }           
+         if (440>Yaw)//rait
+              { forwardL= HIGH ; forwardR= LOW; flagY= HIGH;
+                                                       R= 0;  
+                                                       L= outputYawR;
+                               if  (200>Yaw)           R=L= outputYawR;   
+              }                                                      
+         if ((580>Yaw)&& (Yaw >440)) {  R=L =0;}
     }  
   
 //=============================Swing===============================================
