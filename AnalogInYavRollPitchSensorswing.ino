@@ -18,8 +18,8 @@ int tvist=0;// ШИМ рулевого двигателя
 int tvistFlag;//значение реверса рулевого мотора
 int  Roll,tvistTrans, tvistRoll = 0; //преобразуем значения (приечем обрезанные 823-300) Roll в tvistRoll 1-1023
 int  outputRoll,outputRollR = 0; // положение Roll через map в 0-255  для корректировки скорости бортовых двигателей  
-int Yaw,outputYawL,outputYawR, flagY,flagYF = 0;
-
+int Yaw,outputYawL,outputYawR  = 0;
+int flagY,flagYF; //флаг право -лево по Yaw и flagYF -предыдущего состояния
 int Pitch = 0;        
 int outputPitch = 0;
 int outputPitchD = 0;
@@ -47,8 +47,8 @@ void loop() {
   Pitch = analogRead(analogInPitchPin);
   forwardR=  digitalRead(forward_agoPinR);
   forwardL=  digitalRead(forward_agoPinL);
-  outputRoll = constrain( map(Roll, 440, 0, 0, 100),0,100);//отклонение джоя в проценты
-  outputRollR = constrain( map(Roll, 540, 1023, 0, 100)0,100);//отклонение джоя в проценты
+  outputRoll = constrain( map(Roll, 440, 300, 0, 100),0,100);//отклонение джоя в проценты
+  outputRollR = constrain( map(Roll, 580, 723, 0, 100),0,100);//отклонение джоя в проценты
   tvistTrans =  map(Roll, 823, 300, 1023, 0);// зажимаем джой чтобы для поворота не надо было его отклонять на 100%
   tvistRoll = constrain(tvistTrans, 0, 1023);// фактически значение на которое колеса должны повернуть
   outputPitch = map(Pitch, 540, 1023, 0, 255); 
@@ -59,22 +59,22 @@ void loop() {
    if (460>Pitch) // вперед-outputPitchD
    {     forwardR =forwardL=flag= LOW;
        if (480>Roll)    {            R= outputPitchD;  //left
-                                     L= (outputPitchD-(outputPitchD/100*outputRoll)/1.5);
+                                     L= outputPitchD-(outputPitchD*outputRoll)/150;
                         }
-       if ((540>Roll)&& (Roll>480))  R=L=outputPitchD;                                                     
-       if  (Roll>540)   {            L= outputPitchD;  
-                                     R= (outputPitchD-(outputPitchD/100*outputRollR)/1.5);
+       if ((580>Roll)&& (Roll>440))  R=L=outputPitchD;                                                     
+       if  (Roll>580)   {            L= outputPitchD;  
+                                     R= outputPitchD-(outputPitchD*outputRollR)/150;
                         }
    }  
  if (Pitch > 560) //назад-outputPitch
   {   forwardR =forwardL=flag= HIGH ;         
                                                                                 
      if  (440>Roll)     {             R= outputPitch;  
-                                      L= (outputPitch-(outputPitch/100*outputRoll)/1.5);
+                                      L= outputPitch-(outputPitch*outputRoll)/150;
                         }          
      if  ((580>Roll)&& (Roll>440))    R=L= outputPitch;   
      if  (Roll>580)     {             L= outputPitch;   
-                                      R= (outputPitch-(outputPitch/100*outputRollR)/1.5);
+                                      R= outputPitch-(outputPitch*outputRollR/150);
                         }
     }  
   //================танковый разворот================================================  
@@ -84,15 +84,15 @@ void loop() {
               {   forwardL= LOW; forwardR= HIGH; flagY= LOW; 
                                                        L = 0;
                                                        R= outputYawL;
-                               if (Yaw>820)            R= L= outputYawL;                                        
+                               if (Yaw>820)            L= outputYawL;                                        
               }           
          if (440>Yaw)//rait
               { forwardL= HIGH ; forwardR= LOW; flagY= HIGH;
                                                        R= 0;  
                                                        L= outputYawR;
-                               if  (200>Yaw)           R=L= outputYawR;   
+                               if  (200>Yaw)           R= outputYawR;   
               }                                                      
-         if ((580>Yaw)&& (Yaw >440)) {  R=L =0;}
+         if ((580>Yaw)&& (Yaw >440))   R=L =0;
     }  
   
 //=============================Swing===============================================
@@ -110,18 +110,18 @@ if  (Roll>580)// left  Ydiff
    {   tvistFlag= HIGH;  tvist=240 ;
    if (sensorSwing-tvistRoll<=20 )tvist=0 ;   
    }
-   
+  // ==================плавная работа бортовых моторов=================================== 
 if (flag !=flagP){Rdriv=Ldriv=R=L=0; flagP=flag; }// если предыдущее состояние флага было иное бортовые двиг. стоп.
 if (flagY !=flagYF){Rdriv=Ldriv=0; flagYF=flagY; }
-   if  (Rdriv-R >20)  { Rdriv=Rdriv-25;} 
-   else {if (R-Rdriv>20)Rdriv=Rdriv+25;
+   if  (Rdriv-R >20)  { Rdriv=Rdriv-5;} 
+   else {if (R-Rdriv>20)Rdriv=Rdriv+5;
         else Rdriv=R;  }
-    if (L-Ldriv>20) { Ldriv=Ldriv+25; }
+    if (L-Ldriv>20) { Ldriv=Ldriv+5; }
     else {
-      if (Ldriv-L >20) Ldriv=Ldriv-25;
+      if (Ldriv-L >20) Ldriv=Ldriv-5;
           else Ldriv=L; }
-          
-    // analogWrite(analogWriteRPin, tvist);
+   // ====================  пишем значения в исполнительные выходы=============================        
+     analogWrite(analogWriteRPin,0);  // tvist
      digitalWrite( LRPin, tvistFlag);
      digitalWrite(forward_agoPinL , forwardL );
      digitalWrite(forward_agoPinR ,  forwardR );
