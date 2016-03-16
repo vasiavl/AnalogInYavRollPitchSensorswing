@@ -6,7 +6,7 @@ const int analogInRollPin = A2; // резистор джоя по Roll
 const int analogInPitchPin = A4; // пин для резистора по Pitch
 const int sensorSwingPin = A5; // датчик положения рулевых колес 
  #define forward_agoPinR      7// управляет реверсом правого двигателя
- #define forward_agoPinL      6// управляет реверсом левого двигателя
+ #define forward_agoPinL      4// управляет реверсом левого двигателя
  #define analogWritePRYPinR      11// ШИМ на правый ходовой мотор
  #define analogWritePRYPinL      10 // ШИМ на левый  ходовой мотор
  
@@ -45,20 +45,22 @@ void loop() {
   Yaw = analogRead(analogInYawPin); 
   Roll = analogRead(analogInRollPin); 
   Pitch = analogRead(analogInPitchPin);
+  sensorSwing=analogRead(sensorSwingPin );
   forwardR=  digitalRead(forward_agoPinR);
   forwardL=  digitalRead(forward_agoPinL);
   outputRoll = constrain( map(Roll, 440, 300, 0, 100),0,100);//отклонение джоя в проценты
   outputRollR = constrain( map(Roll, 580, 723, 0, 100),0,100);//отклонение джоя в проценты
   tvistTrans =  map(Roll, 823, 300, 1023, 0);// зажимаем джой чтобы для поворота не надо было его отклонять на 100%
   tvistRoll = constrain(tvistTrans, 0, 1023);// фактически значение на которое колеса должны повернуть
-  outputPitch = map(Pitch, 540, 1023, 0, 255); 
-  outputPitchD = map(Pitch, 480, 0, 0, 255); 
+  outputPitch = map(Pitch, 580, 1023, 100, 255); 
+  outputPitchD = map(Pitch, 440, 0, 100, 255); 
   outputYawL = map(Yaw, 580, 1023, 0, 255); 
   outputYawR = map(Yaw, 440, 0, 0, 255);
  //=============== работа дифференциала при поворотах и движение впередх-назад ========================                                                                                                                                                                                       
    if (460>Pitch) // вперед-outputPitchD
-   {     forwardR =forwardL=flag= LOW;
-       if (480>Roll)    {            R= outputPitchD;  //left
+   {    if (forwardR==HIGH ||forwardL==HIGH)
+                                             {forwardR =forwardL=flag= LOW;R=L= Ldriv=Rdriv=0;}
+       if (440>Roll)    {            R= outputPitchD;  //left
                                      L= outputPitchD-(outputPitchD*outputRoll)/150;
                         }
        if ((580>Roll)&& (Roll>440))  R=L=outputPitchD;                                                     
@@ -67,7 +69,7 @@ void loop() {
                         }
    }  
  if (Pitch > 560) //назад-outputPitch
-  {   forwardR =forwardL=flag= HIGH ;         
+  {   if (forwardR==LOW ||forwardL==LOW){forwardR =forwardL=flag= HIGH ;  R=L= Ldriv=Rdriv =0;}       
                                                                                 
      if  (440>Roll)     {             R= outputPitch;  
                                       L= outputPitch-(outputPitch*outputRoll)/150;
@@ -78,23 +80,23 @@ void loop() {
                         }
     }  
   //================танковый разворот================================================  
-    if ((560>Pitch)&& (Pitch >460))
-    {  
-        if (   Yaw>580)//left
-              {   forwardL= LOW; forwardR= HIGH; flagY= LOW; 
-                                                       L = 0;
-                                                       R= outputYawL;
-                               if (Yaw>820)            L= outputYawL;                                        
-              }           
-         if (440>Yaw)//rait
-              { forwardL= HIGH ; forwardR= LOW; flagY= HIGH;
-                                                       R= 0;  
-                                                       L= outputYawR;
-                               if  (200>Yaw)           R= outputYawR;   
-              }                                                      
-         if ((580>Yaw)&& (Yaw >440))   R=L =0;
-    }  
-  
+      if ((580>Pitch)&& (Pitch >440))
+    {  outputPitch=outputPitchD=R=L= Ldriv=Rdriv =0;
+//        if (   Yaw>580)//left
+//              {   forwardL= LOW; forwardR= HIGH; flagY= LOW; 
+//                                                      L = 0;
+//                                                       R= outputYawL;
+//                               if (Yaw>820)            L= outputYawL;                                        
+//              }           
+//         if (440>Yaw)//rait
+//              { forwardL= HIGH ; forwardR= LOW; flagY= HIGH;
+//                                                       R= 0;  
+//                                                       L= outputYawR;
+//                               if  (200>Yaw)           R= outputYawR;   
+//              }                                                      
+//         if ((580>Yaw)&& (Yaw >440))   R=L =0;
+   }  
+ 
 //=============================Swing===============================================
 if  (Roll>580)// left  Ydiff
   { tvistFlag= LOW;   tvist=240 ;
@@ -112,16 +114,16 @@ if  (Roll>580)// left  Ydiff
    }
   // ==================плавная работа бортовых моторов=================================== 
 if (flag !=flagP){Rdriv=Ldriv=R=L=0; flagP=flag; }// если предыдущее состояние флага было иное бортовые двиг. стоп.
-if (flagY !=flagYF){Rdriv=Ldriv=0; flagYF=flagY; }
-   if  (Rdriv-R >20)  { Rdriv=Rdriv-5;} 
-   else {if (R-Rdriv>20)Rdriv=Rdriv+5;
+if (flagY !=flagYF){Rdriv=Ldriv=R=L=0; flagYF=flagY; }
+   if  (Rdriv-R >20)  { Rdriv=Rdriv-15;} 
+   else {if (R-Rdriv>20)Rdriv=Rdriv+15;
         else Rdriv=R;  }
-    if (L-Ldriv>20) { Ldriv=Ldriv+5; }
+    if (L-Ldriv>20) { Ldriv=Ldriv+15; }
     else {
-      if (Ldriv-L >20) Ldriv=Ldriv-5;
+      if (Ldriv-L >20) Ldriv=Ldriv-15;
           else Ldriv=L; }
    // ====================  пишем значения в исполнительные выходы=============================        
-     analogWrite(analogWriteRPin,0);  // tvist
+     analogWrite(analogWriteRPin,tvist);  // 
      digitalWrite( LRPin, tvistFlag);
      digitalWrite(forward_agoPinL , forwardL );
      digitalWrite(forward_agoPinR ,  forwardR );
@@ -131,10 +133,12 @@ if (flagY !=flagYF){Rdriv=Ldriv=0; flagYF=flagY; }
     But2= digitalRead(Button_2);       
     But3=  digitalRead(Button_3);
    
-  Serial.print(" Yaw = " );                       
-  Serial.print(Yaw);      
-  Serial.print("\t outputYawR = ");      
-  Serial.print(outputYawR); 
+  Serial.print(" tvist = " );                       
+  Serial.print(tvist); 
+Serial.print(" sensorSwing = " );                       
+  Serial.print(sensorSwing );   
+  Serial.print("\t flag = ");      
+  Serial.print(flag); 
   Serial.print("\t outputYawL = ");      
   Serial.print(outputYawL);  
   Serial.print("\n Roll = " );                       
