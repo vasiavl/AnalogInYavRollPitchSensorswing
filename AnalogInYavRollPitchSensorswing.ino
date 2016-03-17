@@ -81,9 +81,21 @@ void loop() {
     }  
   //================танковый разворот================================================  
       if ((580>Pitch)&& (Pitch >440))
-    {  outputPitch=outputPitchD=R=L =0; //
-        
-   }  
+    {  outputPitch=outputPitchD=R=L=Ldriv=Rdriv =0; //
+    if (   Yaw>580)//left
+               {   forwardL= LOW; forwardR= HIGH; flagY= LOW; 
+                                                        L = 0;
+                                                        R= outputYawL;
+                                if (Yaw>820)            L= outputYawL;                                        
+              }           
+         if (440>Yaw)//rait
+               { forwardL= HIGH ; forwardR= LOW; flagY= HIGH;
+                                                        R= 0;  
+                                                        L= outputYawR;
+                                if  (200>Yaw)           R= outputYawR;   
+               }                                                      
+          if ((580>Yaw)&& (Yaw >440))   R=L=Ldriv=Rdriv =0;    
+     }  
  
 //=============================Swing===============================================
 if  (Roll>580)// left  Ydiff
