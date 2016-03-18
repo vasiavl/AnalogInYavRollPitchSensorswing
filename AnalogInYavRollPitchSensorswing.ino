@@ -40,7 +40,9 @@ void setup() {
   Serial.begin(9600); 
 }
 
-void loop() {                               
+void loop() {
+//=========================== calibration menu =======================================
+
   // read the analog in value:
   Yaw = analogRead(analogInYawPin); 
   Roll = analogRead(analogInRollPin); 
