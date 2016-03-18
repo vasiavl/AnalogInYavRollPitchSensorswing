@@ -81,15 +81,15 @@ void loop() {
     }  
   //================танковый разворот================================================  
       if ((580>Pitch)&& (Pitch >440))
-    {  outputPitch=outputPitchD=R=L=Ldriv=Rdriv =0; //
+    {  outputPitch=outputPitchD =0; //
     if (   Yaw>580)//left
-               {   forwardL= LOW; forwardR= HIGH; flagY= LOW; 
+               {   forwardL= HIGH; forwardR= LOW; flagY= LOW; 
                                                         L = 0;
                                                         R= outputYawL;
                                 if (Yaw>820)            L= outputYawL;                                        
               }           
          if (440>Yaw)//rait
-               { forwardL= HIGH ; forwardR= LOW; flagY= HIGH;
+               { forwardL=LOW  ; forwardR=HIGH ; flagY= HIGH;
                                                         R= 0;  
                                                         L= outputYawR;
                                 if  (200>Yaw)           R= outputYawR;   
@@ -115,12 +115,12 @@ if  (Roll>580)// left  Ydiff
   // ==================плавная работа бортовых моторов=================================== 
 if (flag !=flagP){Rdriv=Ldriv=R=L=0; flagP=flag; }// если предыдущее состояние флага было иное бортовые двиг. стоп.
 if (flagY !=flagYF){Rdriv=Ldriv=R=L=0; flagYF=flagY; }
-   if  (Rdriv-R >20)  { Rdriv=Rdriv-10;} 
-   else {if (R-Rdriv>20)Rdriv=Rdriv+10;
+   if  (Rdriv-R >10)  { Rdriv=Rdriv-5;} 
+   else {if (R-Rdriv>10)Rdriv=Rdriv+5;
         else Rdriv=R;  }
-    if (L-Ldriv>20) { Ldriv=Ldriv+10; }
+    if (L-Ldriv>10) { Ldriv=Ldriv+5; }
     else {
-      if (Ldriv-L >20) Ldriv=Ldriv-10;
+      if (Ldriv-L >10) Ldriv=Ldriv-5;
           else Ldriv=L; }
    // ====================  пишем значения в исполнительные выходы=============================        
      analogWrite(analogWriteRPin, tvist);  //tvist 
