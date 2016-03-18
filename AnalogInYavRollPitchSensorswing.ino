@@ -24,7 +24,9 @@ int outputPitch = 0;
 int outputPitchD = 0;
 int L,Ldriv = 0; // шим левого двигателя
 int R,Rdriv = 0;// шим правого двигателя
-
+int PitchMax,PitchMin, PitchCentreMax, PitchCentreMin=0;
+int RollMax,RollMin, RollCentreMax, RollCentreMin=0;
+int YawMax,YawMin, YawCentreMax, YawCentreMin=0;
 int But1=0;
 int But2=0;   //20
 int But3=0;
@@ -42,8 +44,9 @@ void setup() {
 
 void loop() {
 //=========================== calibration menu =======================================
-
-  // read the analog in value:
+  //if (But1==0)  { PitchMax=Pitch;  PitchMin=Pitch;}
+  
+// ==========read the analog in value:=====================================
   Yaw = analogRead(analogInYawPin); 
   Roll = analogRead(analogInRollPin); 
   Pitch = analogRead(analogInPitchPin);
