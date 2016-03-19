@@ -40,7 +40,8 @@ void setup() {
   Serial.begin(9600); 
 }
 
-void loop() {                               
+
+void loop() {
   // read the analog in value:
   Yaw = analogRead(analogInYawPin); 
   Roll = analogRead(analogInRollPin); 
@@ -82,23 +83,24 @@ void loop() {
   //================танковый разворот================================================  
       if ((580>Pitch)&& (Pitch >440))
     {  outputPitch=outputPitchD =0; //
-    if (   Yaw>580)//left
-               {   forwardL= HIGH; forwardR= LOW; flagY= LOW; 
+    if (   Yaw>600)//left
+               {   forwardL= HIGH; forwardR= LOW; flagY= LOW;
+ 
                                                         L = 0;
                                                         R= outputYawL;
-                                if (Yaw>820)            L= outputYawL;                                        
+                                if (Yaw>920)            L= outputYawL;                                        
               }           
-         if (440>Yaw)//rait
+         if (400>Yaw)//rait
                { forwardL=LOW  ; forwardR=HIGH ; flagY= HIGH;
                                                         R= 0;  
                                                         L= outputYawR;
-                                if  (200>Yaw)           R= outputYawR;   
+                                if  (100>Yaw)           R= outputYawR;   
                }                                                      
-          if ((580>Yaw)&& (Yaw >440))   R=L=Ldriv=Rdriv =0;    
+          if ((600>=Yaw)&& (Yaw >=400))   R=L=Ldriv=Rdriv =0;    
      }  
  
 //=============================Swing===============================================
-if  (Roll>580)// left  Ydiff
+if  (Roll>580)//   right
   { tvistFlag= LOW;   tvist=240 ;
     if ( tvistRoll- sensorSwing <=60)tvist=0 ;
    }      
@@ -108,7 +110,7 @@ if  (Roll>580)// left  Ydiff
      if  ( 440 >sensorSwing){tvistFlag= LOW; tvist= map(sensorSwing ,460,0,100,200); }
    }  
   
-  if  (440>Roll)//right
+  if  (440>Roll)//left
    {   tvistFlag= HIGH;  tvist=240 ;
    if (sensorSwing-tvistRoll<=20 )tvist=0 ;   
    }
@@ -123,7 +125,7 @@ if (flagY !=flagYF){Rdriv=Ldriv=R=L=0; flagYF=flagY; }
       if (Ldriv-L >10) Ldriv=Ldriv-5;
           else Ldriv=L; }
    // ====================  пишем значения в исполнительные выходы=============================        
-     analogWrite(analogWriteRPin, tvist);  //tvist 
+     analogWrite(analogWriteRPin, 0);  //tvist 
      digitalWrite( LRPin, tvistFlag);// tvistFlag  реверс руля
      digitalWrite(forward_agoPinL , forwardL );
      digitalWrite(forward_agoPinR ,  forwardR);//forwardR переключение реверса правого двигателя
@@ -182,6 +184,6 @@ if (flagY !=flagYF){Rdriv=Ldriv=R=L=0; flagYF=flagY; }
 //  Serial.print(  flag); 
 // Serial.print("\t flagP=") ;            
 //  Serial.println(  flagP); 
-//   
+ 
 //   delay(2500);                     
 }
