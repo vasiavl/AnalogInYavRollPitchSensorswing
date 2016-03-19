@@ -125,7 +125,7 @@ if (flagY !=flagYF){Rdriv=Ldriv=R=L=0; flagYF=flagY; }
       if (Ldriv-L >10) Ldriv=Ldriv-5;
           else Ldriv=L; }
    // ====================  пишем значения в исполнительные выходы=============================        
-     analogWrite(analogWriteRPin, 0);  //tvist 
+     analogWrite(analogWriteRPin, tvist);  //tvist 
      digitalWrite( LRPin, tvistFlag);// tvistFlag  реверс руля
      digitalWrite(forward_agoPinL , forwardL );
      digitalWrite(forward_agoPinR ,  forwardR);//forwardR переключение реверса правого двигателя
