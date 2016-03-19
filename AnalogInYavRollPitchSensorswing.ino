@@ -1,6 +1,6 @@
-#define Button_1      5//че то какая то фигня с этим пином
- #define Button_2      13
- #define Button_3      12
+//#define Button_1      5//че то какая то фигня с этим пином
+// #define Button_2      13
+// #define Button_3      12
 const int analogInYawPin = A0;  // резистор джоя по Yaw
 const int analogInRollPin = A2; // резистор джоя по Roll
 const int analogInPitchPin = A4; // пин для резистора по Pitch
