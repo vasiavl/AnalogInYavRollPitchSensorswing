@@ -31,9 +31,9 @@ int But3=0;
 int forwardR,forwardL =0;//состояние реверса бортовых двигателей 
 int flag,flagP; //flag "вперед-назад"  flagP-предыдущее состояние флага
 void setup() {
-    pinMode(Button_1, INPUT_PULLUP);
-    pinMode(Button_2, INPUT_PULLUP);
-    pinMode(Button_3, INPUT_PULLUP);
+//    pinMode(Button_1, INPUT_PULLUP);
+//    pinMode(Button_2, INPUT_PULLUP);
+//    pinMode(Button_3, INPUT_PULLUP);
     pinMode(forward_agoPinR, OUTPUT);
     pinMode(forward_agoPinL, OUTPUT);
      pinMode(LRPin, OUTPUT);
