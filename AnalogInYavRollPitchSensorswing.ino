@@ -117,12 +117,12 @@ if  (Roll>580)//   right
   // ==================плавная работа бортовых моторов=================================== 
 if (flag !=flagP){Rdriv=Ldriv=R=L=0; flagP=flag; }// если предыдущее состояние флага было иное бортовые двиг. стоп.
 if (flagY !=flagYF){Rdriv=Ldriv=R=L=0; flagYF=flagY; }
-   if  (Rdriv-R >10)  { Rdriv=Rdriv-5;} 
-   else {if (R-Rdriv>10)Rdriv=Rdriv+5;
+   if  (Rdriv-R >10)  { Rdriv=Rdriv-50;} 
+   else {if (R-Rdriv>10)Rdriv=Rdriv+50;
         else Rdriv=R;  }
-    if (L-Ldriv>10) { Ldriv=Ldriv+5; }
+    if (L-Ldriv>10) { Ldriv=Ldriv+50; }
     else {
-      if (Ldriv-L >10) Ldriv=Ldriv-5;
+      if (Ldriv-L >10) Ldriv=Ldriv-50;
           else Ldriv=L; }
    // ====================  пишем значения в исполнительные выходы=============================        
      analogWrite(analogWriteRPin, tvist);  //tvist 
@@ -179,11 +179,12 @@ if (flagY !=flagYF){Rdriv=Ldriv=R=L=0; flagYF=flagY; }
 //  Serial.print(  forwardL); 
 //   Serial.print("\n Pitch = " );                       
 //  Serial.print(Pitch);
-//     
+////     
 // Serial.print("\t flag=") ;            
 //  Serial.print(  flag); 
 // Serial.print("\t flagP=") ;            
 //  Serial.println(  flagP); 
- 
+// 
 //   delay(2500);                     
 }
+
